@@ -1,5 +1,6 @@
 //feature 1
 import React from 'react'
+import Cart from './components/Cart';
 import Filter from './components/Filter';
 import Products from './components/Products';
 import data from './data.json'
@@ -9,11 +10,35 @@ class App extends React.Component {
     super();
     this.state = {
       products:data.products,
+      cardItems:[],
       size:"",
       sort:""
     }
   }
 
+  addToCart = (product) => {
+    const cardItems = this.state.cardItems.slice();
+    let alreadyInCart = false;
+    cardItems.forEach((item) => {
+      if (item._id === product._id) {
+        item.count++;
+        alreadyInCart = true;
+      }
+    });
+    if (!alreadyInCart) {
+      cardItems.push({...product,count:1})
+    }
+    this.setState({cardItems});
+  }
+
+  removeFromCart = (product) => {
+    const cardItems = this.state.cardItems.slice();
+    this.setState({
+      cardItems:cardItems.filter(x => x._id !== product._id)
+
+    })
+
+ }
   sortProducts = (event) =>{
     const sort = event.target.value;
     console.log(event.target.value);
@@ -33,6 +58,8 @@ class App extends React.Component {
     }))
   }
   
+
+
   filterProducts = (event) =>{
     console.log(event.target.value);
     if (event.target.value === "ALL" || event.target.value === "") {
@@ -66,10 +93,10 @@ class App extends React.Component {
                 sortProducts={this.sortProducts}
                 filterProducts={this.filterProducts}
               />
-              <Products products={this.state.products} />
+              <Products products={this.state.products} addToCart={this.addToCart}/>
             </div>
             <div className="sidebar">
-              Card Items
+              <Cart cardItems={this.state.cardItems} removeFromCart={this.removeFromCart}/>
             </div>
           </div>
         </main>
