@@ -10,10 +10,14 @@ class App extends React.Component {
     super();
     this.state = {
       products:data.products,
-      cardItems:[],
+      cardItems:localStorage.getItem("cartItems") ? JSON.parse(localStorage.getItem("cartItems")) : [],
       size:"",
       sort:""
     }
+  }
+
+  createOrder = (order) => {
+    alert("Need to save order for "+ order.name);
   }
 
   addToCart = (product) => {
@@ -29,15 +33,15 @@ class App extends React.Component {
       cardItems.push({...product,count:1})
     }
     this.setState({cardItems});
+    localStorage.setItem("cartItems", JSON.stringify(cardItems));
   }
 
   removeFromCart = (product) => {
     const cardItems = this.state.cardItems.slice();
     this.setState({
       cardItems:cardItems.filter(x => x._id !== product._id)
-
     })
-
+    localStorage.setItem("cartItems", JSON.stringify(cardItems.filter(x => x._id !== product._id)));
  }
   sortProducts = (event) =>{
     const sort = event.target.value;
@@ -96,7 +100,11 @@ class App extends React.Component {
               <Products products={this.state.products} addToCart={this.addToCart}/>
             </div>
             <div className="sidebar">
-              <Cart cardItems={this.state.cardItems} removeFromCart={this.removeFromCart}/>
+              <Cart 
+              cardItems={this.state.cardItems} 
+              removeFromCart={this.removeFromCart}
+              createOrder={this.createOrder}
+              />
             </div>
           </div>
         </main>
